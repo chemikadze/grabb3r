@@ -14,69 +14,75 @@ func (s *mockSource) Login() error {
 	return nil
 }
 
-func (s *mockSource) ListSolutions() (chan SolutionId, chan error) {
-	resChan := make(chan SolutionId, 10)
+func (s *mockSource) ListSolutions() (chan SolutionDesc, chan error) {
+	resChan := make(chan SolutionDesc, 10)
 	errChan := make(chan error, 1)
 	go func() {
 		for _, solution := range s.solutions {
-			resChan <- solution.Id()
+			resChan <- solution.Desc()
 		}
 		close(resChan)
 	}()
 	return resChan, errChan
 }
 
-func (s *mockSource) GetSolution(id SolutionId) (Solution, error) {
+func (s *mockSource) GetSolution(id SolutionDesc) (Solution, error) {
 	for _, solution := range s.solutions {
-		if solution.Id() == id { // reference quality!
+		if solution.Desc() == id { // reference quality!
 			return &solution, nil
 		}
 	}
 	return nil, errors.New(fmt.Sprintf("Can't find solution '%s'", id))
 }
 
-type simpleSolutionId struct {
-	id string
+// bare minimum desc implementation
+type simpleSolutionDesc struct {
+	id            string
+	language      Language
+	submittedTime time.Time
 }
 
-func (s *simpleSolutionId) Equals(other SolutionId) bool {
+func (s *simpleSolutionDesc) Equals(other SolutionDesc) bool {
 	switch v := other.(type) {
-	case *simpleSolutionId:
+	case *simpleSolutionDesc:
 		return s.id == v.id
 	default:
 		return false
 	}
 }
 
-func (s *simpleSolutionId) String() string {
+func (s *simpleSolutionDesc) String() string {
 	return s.id
 }
 
+func (s *simpleSolutionDesc) ProblemName() string {
+	return "The Main Question Of Universe And Everything"
+}
+
+func (s *simpleSolutionDesc) SubmittedTime() time.Time {
+	return s.submittedTime
+}
+
+func (s *simpleSolutionDesc) Language() Language {
+	return s.language
+}
+
+// bare minimum solution implementation
 type simpleSolution struct {
-	id            SolutionId
-	code          string
-	language      Language
-	submittedTime time.Time
+	desc SolutionDesc
+	code string
 }
 
-func (s *simpleSolution) Id() SolutionId {
-	return s.id
+func (s *simpleSolution) Desc() SolutionDesc {
+	return s.desc
 }
 
 func (s *simpleSolution) Code() string {
 	return s.code
 }
 
-func (s *simpleSolution) SubmittedTime() time.Time {
-	return s.submittedTime
-}
-
-func (s *simpleSolution) Language() Language {
-	return s.language
-}
-
 func NewMockSource() SolutionSource {
 	return &mockSource{[]simpleSolution{
-		{id: &simpleSolutionId{"solution1"}, code: "print 'Hello, World!'", language: "Python", submittedTime: time.Now()},
+		{desc: &simpleSolutionDesc{id: "solution1", language: "Python", submittedTime: time.Now()}, code: "print '42'"},
 	}}
 }

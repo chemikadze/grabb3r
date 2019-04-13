@@ -34,7 +34,7 @@ type errorDetail struct {
 	Detail string
 }
 
-// Leetcode-specific Solution and SolutionId implementation
+// Leetcode-specific Solution and SolutionDesc implementation
 // Instead metadata list, API exposes full information about solution,
 // including source code itself, so there is no need to do extra
 // roundtrip to download solutions.
@@ -56,7 +56,11 @@ func (s *leetcodeSolution) String() string {
 	return fmt.Sprintf("%v", s.SubmissionId)
 }
 
-func (s *leetcodeSolution) Equals(other SolutionId) bool {
+func (s *leetcodeSolution) ProblemName() string {
+	return s.Title
+}
+
+func (s *leetcodeSolution) Equals(other SolutionDesc) bool {
 	if o, ok := other.(*leetcodeSolution); ok {
 		return s.SubmissionId == o.SubmissionId
 	} else {
@@ -64,7 +68,7 @@ func (s *leetcodeSolution) Equals(other SolutionId) bool {
 	}
 }
 
-func (s *leetcodeSolution) Id() SolutionId {
+func (s *leetcodeSolution) Desc() SolutionDesc {
 	return s
 }
 
@@ -199,8 +203,8 @@ func isThrottled(statusCode int, errDetail string) bool {
 		errDetail == "You do not have permission to perform this action."
 }
 
-func (lc *leetcodeSource) ListSolutions() (chan SolutionId, chan error) {
-	resChan := make(chan SolutionId)
+func (lc *leetcodeSource) ListSolutions() (chan SolutionDesc, chan error) {
+	resChan := make(chan SolutionDesc)
 	errChan := make(chan error)
 	closeWithError := func(err error) {
 		errChan <- err
@@ -254,7 +258,7 @@ func (lc *leetcodeSource) ListSolutions() (chan SolutionId, chan error) {
 	return resChan, errChan
 }
 
-func (*leetcodeSource) GetSolution(id SolutionId) (Solution, error) {
+func (*leetcodeSource) GetSolution(id SolutionDesc) (Solution, error) {
 	if ls, ok := id.(*leetcodeSolution); ok {
 		return ls, nil
 	} else {

@@ -14,6 +14,9 @@ func main() {
 	if err := src.Login(); err != nil {
 		panic(err)
 	}
+	if err := dst.Initialize(); err != nil {
+		panic(err)
+	}
 	sync := grabb3r.NewSyncronizer(src, dst)
 	if err := sync.Synchronize(); err != nil {
 		if err, ok := err.(grabb3r.HttpError); ok {

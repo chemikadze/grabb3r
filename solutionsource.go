@@ -4,20 +4,21 @@ import "time"
 
 type SolutionSource interface {
 	Login() error
-	ListSolutions() (chan SolutionId, chan error)
-	GetSolution(id SolutionId) (Solution, error)
+	ListSolutions() (chan SolutionDesc, chan error)
+	GetSolution(id SolutionDesc) (Solution, error)
 }
 
-type SolutionId interface {
+type SolutionDesc interface {
 	String() string
-	Equals(other SolutionId) bool
+	ProblemName() string
+	Language() Language
+	SubmittedTime() time.Time
+	Equals(other SolutionDesc) bool
 }
 
 type Solution interface {
-	Id() SolutionId
+	Desc() SolutionDesc
 	Code() string
-	Language() Language
-	SubmittedTime() time.Time
 }
 
 type Language string
