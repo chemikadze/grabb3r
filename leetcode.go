@@ -110,7 +110,7 @@ func (lc *leetcodeSource) init() {
 		panic(err) // typically, never should be null
 	}
 	lc.httpClient = &http.Client{Jar: jar}
-	lc.requestInterval, _ = time.ParseDuration("1s")
+	lc.requestInterval, _ = time.ParseDuration("2s")
 	lc.rateLimitBackoff, _ = time.ParseDuration("10s")
 	lc.pageSize = 20
 }
@@ -215,7 +215,9 @@ func (lc *leetcodeSource) ListSolutions() (chan SolutionDesc, chan error) {
 		lastKey := ""
 		pageSize := lc.pageSize
 		for hasNext, offset := true, 0; hasNext; {
-			req, err := http.NewRequest("GET", lc.listSolutionsUrl(offset, pageSize, lastKey), nil)
+			pageUrl := lc.listSolutionsUrl(offset, pageSize, lastKey)
+			log.Printf("Requesting %s", pageUrl)
+			req, err := http.NewRequest("GET", pageUrl, nil)
 			if err != nil {
 				closeWithError(err)
 				return
