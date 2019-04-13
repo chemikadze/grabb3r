@@ -32,7 +32,7 @@ func (dst *fileDestination) Initialize() error {
 }
 
 func normalizeString(str string) string {
-	re := regexp.MustCompile("[.,$%&`\"'! ]")
+	re := regexp.MustCompile("[.,$%&`\"'!? ]")
 	return re.ReplaceAllString(str, "_")
 }
 
@@ -44,10 +44,18 @@ func (dst *fileDestination) solutionPath(solution SolutionDesc) string {
 
 func extensionForLanguage(lang Language) string {
 	switch lang {
-	case Language("python"):
+	case Language("python"), Language("python3"):
 		return "py"
-	case Language("go"):
+	case Language("golang"):
 		return "go"
+	case Language("bash"):
+		return "sh"
+	case Language("mysql"):
+		return "mysql.sql"
+	case Language("oraclesql"):
+		return "oracle.sql"
+	case Language("scala"), Language("java"):
+		return string(lang)
 	default:
 		return fmt.Sprintf("%s.txt", normalizeString(string(lang)))
 	}

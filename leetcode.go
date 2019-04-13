@@ -110,8 +110,8 @@ func (lc *leetcodeSource) init() {
 		panic(err) // typically, never should be null
 	}
 	lc.httpClient = &http.Client{Jar: jar}
-	lc.requestInterval, _ = time.ParseDuration("2s")
-	lc.rateLimitBackoff, _ = time.ParseDuration("10s")
+	lc.requestInterval, _ = time.ParseDuration("2.5s")
+	lc.rateLimitBackoff, _ = time.ParseDuration("15s")
 	lc.pageSize = 20
 }
 
@@ -230,7 +230,7 @@ func (lc *leetcodeSource) ListSolutions() (chan SolutionDesc, chan error) {
 			} else if resp.StatusCode != http.StatusOK {
 				errDetail := &errorDetail{}
 				err = json.Unmarshal(body, errDetail)
-				if err == nil && isThrottled(resp.StatusCode, errDetail.Detail) {
+				if isThrottled(resp.StatusCode, errDetail.Detail) {
 					time.Sleep(lc.rateLimitBackoff)
 					log.Printf("retrying after throttling...")
 					continue

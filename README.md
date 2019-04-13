@@ -8,7 +8,7 @@ Usage
 go get github.com/chemikadze/cmd/grabb3r
 export LEETCODE_USER=myuser
 export LEETCODE_PASSWORD=MyPaSsWoRd
-grabb3r
+$GOPATH/bin/grabb3r
 ls ./dest/file/
 ```
 
