@@ -10,7 +10,7 @@ func main() {
 	user, _ := os.LookupEnv("LEETCODE_USER")
 	password, _ := os.LookupEnv("LEETCODE_PASSWORD")
 	src := grabb3r.NewLeetCodeSource(user, password)
-	dst := grabb3r.NewMockDestination()
+	dst := grabb3r.NewFileDestination("./dest/file")
 	if err := src.Login(); err != nil {
 		panic(err)
 	}
